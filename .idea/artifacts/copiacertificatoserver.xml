@@ -1,0 +1,10 @@
+<component name="ArtifactManager">
+  <artifact build-on-make="true" name="copiacertificatoserver">
+    <output-path>$PROJECT_DIR$/out/artifacts/server_jar</output-path>
+    <root id="root">
+      <element id="directory" name="certificati">
+        <element id="file-copy" path="$PROJECT_DIR$/certificati/certificatochiave" />
+      </element>
+    </root>
+  </artifact>
+</component>
