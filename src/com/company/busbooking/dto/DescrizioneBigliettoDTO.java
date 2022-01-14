@@ -6,12 +6,12 @@ import com.fasterxml.jackson.annotation.*;
 
 public class DescrizioneBigliettoDTO {
     private final long id;
-    private final String tipo;
+    private final String descrizione;
     private final BigDecimal prezzo;
 
-    public DescrizioneBigliettoDTO(long id, String tipo, BigDecimal prezzo) {
+    public DescrizioneBigliettoDTO(long id, String descrizione, BigDecimal prezzo) {
         this.id = id;
-        this.tipo = tipo;
+        this.descrizione = descrizione;
         this.prezzo = prezzo;
     }
 
@@ -20,9 +20,9 @@ public class DescrizioneBigliettoDTO {
         return id;
     }
 
-    @JsonGetter("tipo")
-    public String ottieniTipo() {
-        return tipo;
+    @JsonGetter("descrizione")
+    public String ottieniDescrizione() {
+        return descrizione;
     }
 
     @JsonGetter("prezzo")

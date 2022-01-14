@@ -46,13 +46,23 @@ class BusBookingTest {
 
         busBooking.aggiungiCliente(cliente1);
         busBooking.aggiungiCliente(cliente2);
+
+        Addetto addetto1 = new Addetto(1, "Pippo"), addetto2 = new Addetto(2, "");
+        Corsa corsa1 = new Corsa(1), corsa2 = new Corsa(2);
+        addetto1.aggiornaCorsa(corsa1);
+        addetto2.aggiornaCorsa(corsa2);
+
+        busBooking.aggiungiAddetto(addetto1);
+        busBooking.aggiungiAddetto(addetto2);
+        busBooking.aggiungiCorsa(corsa1);
+        busBooking.aggiungiCorsa(corsa2);
     }
 
     /**
      * Verifica che i cataloghi siano stati inseriti correttamente.
      */
     @Test
-    void testAggiungiCatalogo() throws BusBooking.CatalogoInesistenteException {
+    void aggiungiCatalogo() throws BusBooking.CatalogoInesistenteException {
         HashSet<String> listaCitta = new HashSet<>(busBooking.ottieniListaCitta());
         assertTrue(listaCitta.contains("Palermo"));
         assertTrue(listaCitta.contains("Catania"));
@@ -75,8 +85,8 @@ class BusBookingTest {
      * Verifica che i biglietti in acquisto siano autentici.
      */
     @Test
-    void acquistaBiglietto() throws BusBooking.ErroreCrittografiaException, NoSuchAlgorithmException, SignatureException, InvalidKeyException {
-        DescrizioneBiglietto descrizione = new DescrizioneBiglietto(0, BigDecimal.ONE, DescrizioneBiglietto.TipoBiglietto.TEMPO);
+    void acquistaBiglietto() throws BusBooking.ErroreCrittografiaException, NoSuchAlgorithmException, SignatureException, InvalidKeyException, Biglietto.BigliettoSenzaFirmaException {
+        DescrizioneBiglietto descrizione = new DescrizioneBigliettoTempo(0, BigDecimal.ONE, 10);
 
         acquisto1 = busBooking.acquistaBiglietto(descrizione);
         acquisto2 = busBooking.acquistaBiglietto(descrizione);
@@ -91,7 +101,6 @@ class BusBookingTest {
     @Test
     void effettuaPagamento() throws BusBooking.ErroreCrittografiaException, BusBooking.ClienteInesistenteException {
         Cliente cliente = busBooking.ottieniCliente(0);
-        DescrizioneBiglietto descrizione = new DescrizioneBiglietto(1, BigDecimal.ONE, DescrizioneBiglietto.TipoBiglietto.ANDATA_RITORNO);
 
         assertTrue(busBooking.effettuaPagamento(cliente, acquisto1, cliente.ottieniCarta(0), 111));
         assertFalse(busBooking.effettuaPagamento(cliente, acquisto2, cliente.ottieniCarta(0), 222));
@@ -101,4 +110,25 @@ class BusBookingTest {
         assertFalse(acquisti.hasNext());
     }
 
+    @Test
+    void aggiungiAddetto() throws BusBooking.AddettoInesistenteException {
+        assertEquals(1, busBooking.ottieniAddetto(1).ottieniId());
+        assertEquals(2, busBooking.ottieniAddetto(2).ottieniId());
+
+        assertThrows(BusBooking.AddettoInesistenteException.class, () -> busBooking.ottieniAddetto(3));
+    }
+
+    @Test
+    void aggiungiCorsa() throws BusBooking.CorsaInesistenteException {
+        assertEquals(1, busBooking.ottieniCorsa(1).ottieniId());
+        assertEquals(2, busBooking.ottieniCorsa(2).ottieniId());
+
+        assertThrows(BusBooking.CorsaInesistenteException.class, () -> busBooking.ottieniCorsa(3));
+    }
+
+    @Test
+    void aggiornaCorsa() throws BusBooking.AddettoInesistenteException {
+        assertEquals(1, busBooking.ottieniAddetto(1).ottieniCorsa().ottieniId());
+        assertEquals(2, busBooking.ottieniAddetto(2).ottieniCorsa().ottieniId());
+    }
 }

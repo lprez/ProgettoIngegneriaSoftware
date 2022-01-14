@@ -8,8 +8,7 @@ import java.util.Date;
 import static org.junit.jupiter.api.Assertions.*;
 
 class AcquistoTest {
-    private final DescrizioneBiglietto biglietto1euro =
-            new DescrizioneBiglietto(0, BigDecimal.ONE, DescrizioneBiglietto.TipoBiglietto.ANDATA_RITORNO);
+    private final DescrizioneBiglietto biglietto1euro = new DescrizioneBigliettoCorse(0, BigDecimal.ONE, 1);
     private final CartaDiCredito carta = new CartaDiCredito(0, "", "", new Date());
 
     /**

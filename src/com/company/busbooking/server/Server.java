@@ -1,6 +1,7 @@
 package com.company.busbooking.server;
 
 import com.company.busbooking.dominio.*;
+import com.company.busbooking.interfacce.ServizioAddetto;
 import com.company.busbooking.interfacce.ServizioCliente;
 import io.javalin.Javalin;
 
@@ -34,9 +35,14 @@ public class Server {
 
         BusBooking busBooking = new BusBooking(chiavi, servizioPagamento);
         caricaDatiProva(busBooking);
+
         ServizioCliente servizioCliente = new GestoreCliente(busBooking);
         ServizioClienteProxyServer servizioClienteProxy = new ServizioClienteProxyServer(servizioCliente);
         servizioClienteProxy.inizializza(server);
+
+        ServizioAddetto servizioAddetto = new GestoreAddetto(busBooking);
+        ServizioAddettoProxyServer servizioAddettoProxy = new ServizioAddettoProxyServer(servizioAddetto);
+        servizioAddettoProxy.inizializza(server);
     }
 
     private static KeyPair caricaChiavi()
@@ -59,14 +65,14 @@ public class Server {
         CatalogoBiglietti catalogo1 = new CatalogoBiglietti("Catania");
         CatalogoBiglietti catalogo2 = new CatalogoBiglietti("Palermo");
 
-        DescrizioneBiglietto descrizione1 = new DescrizioneBiglietto(
-                0, BigDecimal.valueOf(1.5), DescrizioneBiglietto.TipoBiglietto.ANDATA_RITORNO
+        DescrizioneBiglietto descrizione1 = new DescrizioneBigliettoCorse(
+                0, BigDecimal.valueOf(1.5), 2
         );
-        DescrizioneBiglietto descrizione2 = new DescrizioneBiglietto(
-                1, BigDecimal.valueOf(1), DescrizioneBiglietto.TipoBiglietto.CORSA_SINGOLA
+        DescrizioneBiglietto descrizione2 = new DescrizioneBigliettoCorse(
+                1, BigDecimal.valueOf(1), 1
         );
-        DescrizioneBiglietto descrizione3 = new DescrizioneBiglietto(
-                2, BigDecimal.valueOf(0.5), DescrizioneBiglietto.TipoBiglietto.TEMPO
+        DescrizioneBiglietto descrizione3 = new DescrizioneBigliettoTempo(
+                2, BigDecimal.valueOf(0.5), 90
         );
 
         catalogo1.aggiungiBiglietto(descrizione1);
@@ -86,5 +92,12 @@ public class Server {
         busBooking.aggiungiCatalogo(catalogo2);
 
         busBooking.aggiungiCliente(cliente1);
+
+        Addetto addetto1 = new Addetto(0, "Pippo");
+        Corsa corsa1 = new Corsa(0);
+        addetto1.aggiornaCorsa(corsa1);
+
+        busBooking.aggiungiAddetto(addetto1);
+        busBooking.aggiungiCorsa(corsa1);
     }
 }

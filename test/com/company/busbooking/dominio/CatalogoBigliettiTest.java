@@ -7,8 +7,8 @@ import java.math.BigDecimal;
 import static org.junit.jupiter.api.Assertions.*;
 
 class CatalogoBigliettiTest {
-    private final DescrizioneBiglietto descrizione1 = new DescrizioneBiglietto(1, BigDecimal.ZERO, DescrizioneBiglietto.TipoBiglietto.ANDATA_RITORNO);
-    private final DescrizioneBiglietto descrizione2 = new DescrizioneBiglietto(2, BigDecimal.ZERO, DescrizioneBiglietto.TipoBiglietto.ANDATA_RITORNO);
+    private final DescrizioneBiglietto descrizione1 = new DescrizioneBigliettoCorse(1, BigDecimal.ZERO, 1);
+    private final DescrizioneBiglietto descrizione2 = new DescrizioneBigliettoTempo(2, BigDecimal.ONE, 10);
 
     /**
      * Questo test verifica che le descrizioni dei biglietti vengano aggiunte e trovate correttamente.

@@ -2,15 +2,13 @@ package com.company.busbooking.dominio;
 
 import java.math.BigDecimal;
 
-public class DescrizioneBiglietto {
-    private final long id;
-    private final BigDecimal prezzo;
-    private final TipoBiglietto tipoBiglietto;
+public abstract class DescrizioneBiglietto {
+    protected final long id;
+    protected final BigDecimal prezzo;
 
-    public DescrizioneBiglietto(long id, BigDecimal prezzo, TipoBiglietto tipoBiglietto) {
+    protected DescrizioneBiglietto(long id, BigDecimal prezzo) {
         this.id = id;
         this.prezzo = prezzo;
-        this.tipoBiglietto = tipoBiglietto;
     }
 
     public long ottieniId() {
@@ -21,13 +19,5 @@ public class DescrizioneBiglietto {
         return prezzo;
     }
 
-    public TipoBiglietto ottieniTipoBiglietto() {
-        return tipoBiglietto;
-    }
-
-    public enum TipoBiglietto {
-        TEMPO,
-        CORSA_SINGOLA,
-        ANDATA_RITORNO
-    }
+    public abstract ValidatoreBiglietto creaValidatore();
 }

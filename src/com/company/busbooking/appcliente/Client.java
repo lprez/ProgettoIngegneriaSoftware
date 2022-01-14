@@ -12,7 +12,9 @@ public class Client {
     private static final long idCliente = 0;
 
     private static final List<Comando> comandi = new ArrayList<Comando>(
-            List.of(new ComandoAcquistaBiglietto(), new ComandoEsci())
+            List.of(new ComandoAcquistaBiglietto(),
+                    new ComandoMostraBiglietto(),
+                    new ComandoEsci())
     );
 
     public static void main(String[] args) throws IOException {

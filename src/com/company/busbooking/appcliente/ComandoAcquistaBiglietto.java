@@ -11,15 +11,20 @@ import java.util.Collection;
 public class ComandoAcquistaBiglietto extends Comando {
     @Override
     public boolean esegui(long idCliente, ServizioCliente servizio) {
+        String citta;
+        Long idDescrizioneBiglietto;
+
         try {
-            String citta = chiediCitta(servizio);
-            long idDescrizioneBiglietto = chiediBiglietto(servizio, citta);
+            citta = chiediCitta(servizio);
+            if (citta == null) return true;
+            idDescrizioneBiglietto = chiediBiglietto(servizio, citta);
+            if (idDescrizioneBiglietto == null) return true;
         } catch (IOException e) {
             e.printStackTrace();
             return true;
         }
 
-        int idAcquisto = servizio.acquistaBiglietto("Catania", 1);
+        int idAcquisto = servizio.acquistaBiglietto(citta, idDescrizioneBiglietto);
 
         if (idAcquisto >= 0) {
             System.out.println("Creato un nuovo acquisto #" + idAcquisto);
@@ -47,13 +52,12 @@ public class ComandoAcquistaBiglietto extends Comando {
         }
     }
 
-    private long chiediBiglietto(ServizioCliente servizio, String citta) throws IOException {
+    private Long chiediBiglietto(ServizioCliente servizio, String citta) throws IOException {
         Collection<DescrizioneBigliettoDTO> listaBiglietti = servizio.richiediCatalogoBiglietti(citta);
         Menu<Long> menuBiglietti = new Menu<Long>(
                 listaBiglietti.stream().map(descrizioneBigliettoDTO ->
                         new Menu.ElementoMenu<Long>(
-                                "Tipo:  " + descrizioneBigliettoDTO.ottieniTipo() + ", " +
-                                "Prezzo:  " + descrizioneBigliettoDTO.ottieniPrezzo(),
+                                descrizioneBigliettoDTO.ottieniDescrizione(),
                                 descrizioneBigliettoDTO.ottieniId()
                         )
                 ).toList()

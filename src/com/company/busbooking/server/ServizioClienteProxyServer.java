@@ -1,9 +1,8 @@
 package com.company.busbooking.server;
 
 import com.company.busbooking.interfacce.ServizioCliente;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.javalin.Javalin;
-
-import java.util.Map;
 
 public class ServizioClienteProxyServer extends ProxyServer {
     private final ServizioCliente servizio;
@@ -37,6 +36,17 @@ public class ServizioClienteProxyServer extends ProxyServer {
 
         server.delete("/cliente/acquisto/{id}", (ctx) -> {
             servizio.annullaAcquisto(Integer.parseInt(ctx.pathParam("id")));
+        });
+
+        server.get("/cliente/biglietti/{idCliente}", ctx -> {
+            ctx.json(servizio.richiediListaBiglietti(Long.parseLong(ctx.pathParam("idCliente"))));
+        });
+
+        server.get("/cliente/biglietti/{idCliente}/{indiceBiglietto}", ctx -> {
+            ctx.result(new ObjectMapper().writeValueAsString(servizio.richiediCodice(
+                    Long.parseLong(ctx.pathParam("idCliente")),
+                    Integer.parseInt(ctx.pathParam("indiceBiglietto"))
+            )));
         });
     }
 }

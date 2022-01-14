@@ -10,7 +10,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class ClienteTest {
     private final Biglietto biglietto =
-            new Biglietto(new DescrizioneBiglietto(0, BigDecimal.ZERO, DescrizioneBiglietto.TipoBiglietto.ANDATA_RITORNO));
+            new Biglietto(new DescrizioneBigliettoCorse(0, BigDecimal.ZERO, 1));
     private final CartaDiCredito carta1 = new CartaDiCredito(1, "", "", new Date());
     private final CartaDiCredito carta2 = new CartaDiCredito(2, "", "", new Date());
 

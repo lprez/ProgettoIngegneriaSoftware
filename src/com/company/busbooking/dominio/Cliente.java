@@ -4,7 +4,7 @@ import java.util.*;
 
 public class Cliente {
     private final long id;
-    private String nome;
+    private final String nome;
     private final Map<Long, CartaDiCredito> carte = new HashMap<>();
     private final List<Acquisto> acquisti = new LinkedList<>();
 
@@ -19,6 +19,20 @@ public class Cliente {
 
     public Iterator<Acquisto> ottieniAcquisti() {
         return acquisti.iterator();
+    }
+
+    public List<Biglietto> ottieniListaBiglietti() {
+        List<Biglietto> listaBiglietti = new ArrayList<>();
+
+        for (Iterator<Acquisto> iter = acquisti.iterator(); iter.hasNext();) {
+            Biglietto biglietto = iter.next().ottieniBiglietto();
+
+            if (biglietto.valido()) {
+                listaBiglietti.add(biglietto);
+            }
+        }
+
+        return listaBiglietti;
     }
 
     public String ottieniNome() {
