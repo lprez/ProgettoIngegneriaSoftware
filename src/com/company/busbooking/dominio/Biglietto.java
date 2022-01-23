@@ -131,7 +131,7 @@ public class Biglietto {
         return GeneratoreId.ottieniGeneratore().generaIdBiglietto();
     }
 
-    public Object ottieniDescrizione() {
+    public DescrizioneBiglietto ottieniDescrizione() {
         return descrizione;
     }
 

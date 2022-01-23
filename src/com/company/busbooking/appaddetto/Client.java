@@ -4,7 +4,6 @@ import com.company.busbooking.interfacce.ServizioAddetto;
 import com.company.busbooking.util.Menu;
 
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.security.*;
 import java.security.cert.CertificateException;
@@ -44,7 +43,7 @@ public class Client {
         );
 
         Comando comando;
-        while ((comando = menuComandi.mostra()) != null) {
+        while ((comando = menuComandi.mostraSeleziona()) != null) {
             if (!comando.esegui(idAddetto, servizio)) {
                 break;
             }

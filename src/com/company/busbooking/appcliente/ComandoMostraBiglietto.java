@@ -40,7 +40,7 @@ public class ComandoMostraBiglietto extends Comando {
 
         Integer indiceBiglietto = null;
         try {
-            indiceBiglietto = menuBiglietti.mostra();
+            indiceBiglietto = menuBiglietti.mostraSeleziona();
         } catch (IOException e) {
             e.printStackTrace();
             return null;

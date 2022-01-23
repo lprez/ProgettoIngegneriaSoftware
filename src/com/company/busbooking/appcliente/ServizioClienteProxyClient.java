@@ -1,7 +1,6 @@
 package com.company.busbooking.appcliente;
 
-import com.company.busbooking.dto.BigliettoDTO;
-import com.company.busbooking.dto.DescrizioneBigliettoDTO;
+import com.company.busbooking.dto.*;
 import com.company.busbooking.interfacce.ServizioCliente;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import kong.unirest.GenericType;
@@ -84,22 +83,13 @@ public class ServizioClienteProxyClient implements ServizioCliente {
 
     @Override
     public Collection<BigliettoDTO> richiediListaBiglietti(long idCliente) {
-        try {
-            return Unirest.get(indirizzo + "/cliente/biglietti/{idCliente}")
-                    .routeParam("idCliente", Long.toString(idCliente))
-                    .asObject(new GenericType<Collection<BigliettoDTO>>() {
-                    })
-                    .getBody();
-        } catch (UnirestException e) {
-            e.printStackTrace();
-            return Collections.emptyList();
-        }
+        return richiediListaGenerica("biglietti", new GenericType<Collection<BigliettoDTO>>() {}, idCliente);
     }
 
     @Override
     public byte[] richiediCodice(long idCliente, int indiceBiglietto) {
         try {
-            String codice = Unirest.get(indirizzo + "/cliente/biglietti/{idCliente}/{indiceBiglietto}")
+            String codice = Unirest.get(indirizzo + "/cliente/{idCliente}/biglietti/{indiceBiglietto}")
                 .routeParam("idCliente", Long.toString(idCliente))
                 .routeParam("indiceBiglietto", Integer.toString(indiceBiglietto))
                 .asString()
@@ -108,6 +98,109 @@ public class ServizioClienteProxyClient implements ServizioCliente {
         } catch (IOException | UnirestException e) {
             e.printStackTrace();
             return null;
+        }
+    }
+
+    @Override
+    public boolean creaPreferito(long idCliente, String citta, int idAcquisto, long idCarta) {
+        try {
+            return Unirest.post(indirizzo + "/cliente/preferito")
+                    .field("idCliente", Long.toString(idCliente))
+                    .field("citta",  citta)
+                    .field("idAcquisto", Long.toString(idAcquisto))
+                    .field("idCarta", Long.toString(idCarta))
+                    .asObject(Boolean.class)
+                    .getBody();
+        } catch (UnirestException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    @Override
+    public boolean eliminaPreferito(long idCliente, int indicePreferito) {
+        try {
+            return Unirest.delete(indirizzo + "/cliente/{idCliente}/preferito/{idPreferito}")
+                    .routeParam("idCliente", Long.toString(idCliente))
+                    .routeParam("idPreferito", Integer.toString(indicePreferito))
+                    .asObject(Boolean.class)
+                    .getBody();
+        } catch (UnirestException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    @Override
+    public Collection<PreferitoDTO> richiediListaPreferiti(long idCliente) {
+        return richiediListaGenerica("preferiti", new GenericType<Collection<PreferitoDTO>>() {}, idCliente);
+    }
+
+    @Override
+    public Collection<CartaDiCreditoDTO> richiediListaCarte(long idCliente) {
+        return richiediListaGenerica("carte", new GenericType<Collection<CartaDiCreditoDTO>>() {}, idCliente);
+    }
+
+    @Override
+    public boolean creaCarta(long idCliente, String codice, String intestatario, String scadenza) {
+        try {
+            return Unirest.post(indirizzo + "/cliente/carta")
+                    .field("idCliente", Long.toString(idCliente))
+                    .field("codice", codice)
+                    .field("intestatario", intestatario)
+                    .field("scadenza", scadenza)
+                    .asObject(Boolean.class)
+                    .getBody();
+        } catch (UnirestException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    @Override
+    public boolean modificaCarta(long idCliente, long idCarta, String codice, String intestatario, String scadenza) {
+        try {
+            return Unirest.put(indirizzo + "/cliente/carta")
+                    .field("idCliente", Long.toString(idCliente))
+                    .field("idCarta", Long.toString(idCarta))
+                    .field("codice", codice)
+                    .field("intestatario", intestatario)
+                    .field("scadenza", scadenza)
+                    .asObject(Boolean.class)
+                    .getBody();
+        } catch (UnirestException e) {
+            e.printStackTrace();
+            return false;
+        }    }
+
+    @Override
+    public boolean eliminaCarta(long idCliente, long idCarta) {
+        try {
+            return Unirest.delete(indirizzo + "/cliente/{idCliente}/carta/{idCarta}")
+                    .routeParam("idCliente", Long.toString(idCliente))
+                    .routeParam("idCarta", Long.toString(idCarta))
+                    .asObject(Boolean.class)
+                    .getBody();
+        } catch (UnirestException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    @Override
+    public Collection<AcquistoDTO> richiediElencoMovimenti(long idCliente) {
+        return richiediListaGenerica("movimenti", new GenericType<Collection<AcquistoDTO>>() {}, idCliente);
+    }
+
+    public <T> Collection<T> richiediListaGenerica(String nome, GenericType<Collection<T>> tipo, long idCliente) {
+        try {
+            return Unirest.get(indirizzo + "/cliente/{idCliente}/" + nome)
+                    .routeParam("idCliente", Long.toString(idCliente))
+                    .asObject(tipo)
+                    .getBody();
+        } catch (UnirestException e) {
+            e.printStackTrace();
+            return Collections.emptyList();
         }
     }
 }

@@ -82,11 +82,7 @@ public class Server {
         catalogo2.aggiungiBiglietto(descrizione2);
         catalogo2.aggiungiBiglietto(descrizione3);
 
-        CartaDiCredito carta1 = new CartaDiCredito(0, "1234-5678-9123-4567", "Mario Rossi", new Date());
-        CartaDiCredito carta2 = new CartaDiCredito(1, "9999-8888-7777-6666", "Luigi Rossi", new Date());
-
         Cliente cliente1 = new Cliente(0, "Luigi Rossi");
-        cliente1.aggiungiCarta(carta2);
 
         busBooking.aggiungiCatalogo(catalogo1);
         busBooking.aggiungiCatalogo(catalogo2);

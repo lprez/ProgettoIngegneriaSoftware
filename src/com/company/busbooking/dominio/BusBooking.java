@@ -1,10 +1,7 @@
 package com.company.busbooking.dominio;
 
 import java.security.*;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class BusBooking {
     private final KeyPair chiave;
@@ -88,8 +85,42 @@ public class BusBooking {
         return ottieniBiglietto(Biglietto.estraiId(codice));
     }
 
+    public void creaPreferito(Cliente cliente, String citta, Acquisto acquisto, CartaDiCredito carta) {
+        cliente.creaPreferito(citta, acquisto, carta);
+    }
+
+    public Acquisto acquistaPreferito(Preferito preferito) throws ErroreCrittografiaException {
+        return this.acquistaBiglietto(preferito.ottieniDescrizioneBiglietto());
+    }
+
+    public List<Preferito> ottieniListaPreferiti(Cliente cliente) {
+        return cliente.ottieniPreferiti();
+    }
+
+    public void eliminaPreferito(Cliente cliente, int indice) {
+        cliente.eliminaPreferito(indice);
+    }
+
+    public Collection<CartaDiCredito> ottieniListaCarte(Cliente cliente) {
+        return cliente.ottieniListaCarte();
+    }
+
+    public CartaDiCredito creaCarta(String codice, String intestatario, Date scadenza) throws CartaNonValidaException {
+        CartaDiCredito carta = new CartaDiCredito(codice, intestatario, scadenza);
+        if (!carta.codiceValido()) throw new CartaNonValidaException("Il codice della carta non è valido.");
+        return carta;
+    }
+
+    public void aggiungiCarta(Cliente cliente, CartaDiCredito carta) {
+        cliente.aggiungiCarta(carta);
+    }
+
     public void aggiungiCliente(Cliente cliente) {
         clienti.put(cliente.ottieniId(), cliente);
+    }
+
+    public List<Acquisto> ottieniElencoMovimenti(Cliente cliente) {
+        return cliente.ottieniAcquisti();
     }
 
     public Cliente ottieniCliente(long idCliente) throws ClienteInesistenteException {
@@ -132,6 +163,21 @@ public class BusBooking {
         }
     }
 
+    public boolean modificaCarta(Cliente cliente, long idCarta, String codice, String intestatario, Date scadenza) throws CartaNonValidaException {
+        CartaDiCredito carta;
+        if ((carta = cliente.ottieniCarta(idCarta)) != null) {
+            if (codice.isBlank()) codice = carta.ottieniCodice();
+            cliente.eliminaCarta(idCarta);
+            cliente.aggiungiCarta(this.creaCarta(codice, intestatario, scadenza));
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public boolean eliminaCarta(Cliente cliente, long idCarta) {
+        return cliente.eliminaCarta(idCarta);
+    }
 
     public class CatalogoInesistenteException extends Exception {
         public CatalogoInesistenteException(String msg) {
@@ -166,6 +212,12 @@ public class BusBooking {
     public class ErroreCrittografiaException extends Exception {
         public ErroreCrittografiaException(String msg, Throwable err) {
             super(msg, err);
+        }
+    }
+
+    public class CartaNonValidaException extends Exception {
+        public CartaNonValidaException(String msg) {
+            super(msg);
         }
     }
 }

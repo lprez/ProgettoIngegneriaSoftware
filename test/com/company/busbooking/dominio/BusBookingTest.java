@@ -12,6 +12,7 @@ import java.security.SignatureException;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -105,9 +106,9 @@ class BusBookingTest {
         assertTrue(busBooking.effettuaPagamento(cliente, acquisto1, cliente.ottieniCarta(0), 111));
         assertFalse(busBooking.effettuaPagamento(cliente, acquisto2, cliente.ottieniCarta(0), 222));
 
-        Iterator<Acquisto> acquisti = cliente.ottieniAcquisti();
-        assertEquals(acquisto1, acquisti.next());
-        assertFalse(acquisti.hasNext());
+        List<Acquisto> acquisti = cliente.ottieniAcquisti();
+        assertEquals(acquisto1, acquisti.get(0));
+        assertEquals(1, acquisti.size());
     }
 
     @Test

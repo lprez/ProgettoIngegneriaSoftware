@@ -2,7 +2,7 @@ package com.company.busbooking.util;
 
 public class GeneratoreId {
     private static GeneratoreId istanza;
-    private long idBiglietto = 0;
+    private long idBiglietto = 0, idCarta = 0;
 
     private GeneratoreId() {}
 
@@ -15,5 +15,9 @@ public class GeneratoreId {
 
     public long generaIdBiglietto() {
         return idBiglietto++;
+    }
+
+    public long generaIdCarta() {
+        return idCarta++;
     }
 }

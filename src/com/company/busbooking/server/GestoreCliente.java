@@ -1,10 +1,11 @@
 package com.company.busbooking.server;
 
 import com.company.busbooking.dominio.*;
-import com.company.busbooking.dto.BigliettoDTO;
-import com.company.busbooking.dto.DescrizioneBigliettoDTO;
+import com.company.busbooking.dto.*;
 import com.company.busbooking.interfacce.ServizioCliente;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -12,7 +13,8 @@ import java.util.stream.IntStream;
 public class GestoreCliente implements ServizioCliente {
     private final BusBooking busBooking;
     private final List<Acquisto> acquistiInCorso = new ArrayList<Acquisto>();
-    private final Map<Long, List<Biglietto>> biglietti = new HashMap<>();
+    private final Map<Long, List<Biglietto>> cacheBiglietti = new HashMap<>();
+    private static final SimpleDateFormat formatoScadenza = new SimpleDateFormat("MM/yy");
 
     public GestoreCliente(BusBooking busBooking) {
         this.busBooking = busBooking;
@@ -89,7 +91,7 @@ public class GestoreCliente implements ServizioCliente {
     public Collection<BigliettoDTO> richiediListaBiglietti(long idCliente) {
         try {
             List<Biglietto> lista = busBooking.ottieniListaBiglietti(busBooking.ottieniCliente(idCliente));
-            biglietti.put(idCliente, lista);
+            cacheBiglietti.put(idCliente, lista);
             return IntStream.range(0, lista.size()).mapToObj(
                     indice -> new BigliettoDTO(indice, lista.get(indice).ottieniDescrizione().toString())
             ).collect(Collectors.toList());
@@ -102,12 +104,135 @@ public class GestoreCliente implements ServizioCliente {
     public byte[] richiediCodice(long idCliente, int indiceBiglietto) {
         List<Biglietto> lista;
         try {
-            if (biglietti.containsKey(idCliente) && indiceBiglietto < (lista = biglietti.get(idCliente)).size()) {
+            if (cacheBiglietti.containsKey(idCliente) && indiceBiglietto < (lista = cacheBiglietti.get(idCliente)).size()) {
                 return lista.get(indiceBiglietto).ottieniCodice();
             }
         } catch (Biglietto.BigliettoSenzaFirmaException e) {
                 e.printStackTrace();
         }
         return new byte[0];
+    }
+
+    @Override
+    public boolean creaPreferito(long idCliente, String citta, int idAcquisto, long idCarta) {
+        Acquisto acquisto;
+        if (idAcquisto < acquistiInCorso.size() && (acquisto = acquistiInCorso.get(idAcquisto)) != null) {
+            Cliente cliente = null;
+            try {
+                cliente = busBooking.ottieniCliente(idCliente);
+            } catch (BusBooking.ClienteInesistenteException e) {
+                return false;
+            }
+            CartaDiCredito carta = cliente.ottieniCarta(idCarta);
+            cliente.creaPreferito(citta, acquisto, carta);
+
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    @Override
+    public boolean eliminaPreferito(long idCliente, int indicePreferito) {
+        try {
+            Cliente cliente = busBooking.ottieniCliente(idCliente);
+            busBooking.eliminaPreferito(cliente, indicePreferito);
+            return true;
+        } catch (BusBooking.ClienteInesistenteException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    @Override
+    public Collection<PreferitoDTO> richiediListaPreferiti(long idCliente) {
+        try {
+            Cliente cliente = busBooking.ottieniCliente(idCliente);
+            return busBooking.ottieniListaPreferiti(cliente).stream().map(
+                    preferito -> new PreferitoDTO(
+                            preferito.ottieniCitta(),
+                            preferito.ottieniDescrizioneBiglietto().ottieniId(),
+                            preferito.ottieniDescrizioneBiglietto().toString(),
+                            preferito.ottieniCartaDiCredito().ottieniId(),
+                            preferito.ottieniCartaDiCredito().ottieniCodiceOscurato()
+                    )
+            ).collect(Collectors.toList());
+        } catch (BusBooking.ClienteInesistenteException e) {
+            e.printStackTrace();
+            return Collections.emptyList();
+        }
+    }
+
+    @Override
+    public Collection<CartaDiCreditoDTO> richiediListaCarte(long idCliente) {
+        try {
+            Cliente cliente = busBooking.ottieniCliente(idCliente);
+            return busBooking.ottieniListaCarte(cliente).stream().map(
+                    carta -> new CartaDiCreditoDTO(
+                            carta.ottieniId(),
+                            carta.ottieniCodiceOscurato(),
+                            carta.ottieniIntestatario(),
+                            formatoScadenza.format(carta.ottieniScadenza())
+                    )
+            ).collect(Collectors.toList());
+        } catch (BusBooking.ClienteInesistenteException e) {
+            e.printStackTrace();
+            return Collections.emptyList();
+        }    }
+
+    @Override
+    public boolean creaCarta(long idCliente, String codice, String intestatario, String scadenza) {
+        try {
+            Date dataScadenza = formatoScadenza.parse(scadenza);
+            Cliente cliente = busBooking.ottieniCliente(idCliente);
+            busBooking.aggiungiCarta(
+                    cliente,
+                    busBooking.creaCarta(codice, intestatario, dataScadenza)
+            );
+            return true;
+        } catch (ParseException | BusBooking.ClienteInesistenteException | BusBooking.CartaNonValidaException e) {
+            return false;
+        }
+    }
+
+    @Override
+    public boolean modificaCarta(long idCliente, long idCarta, String codice, String intestatario, String scadenza) {
+        try {
+            Cliente cliente = busBooking.ottieniCliente(idCliente);
+            return busBooking.modificaCarta(cliente, idCarta, codice, intestatario, formatoScadenza.parse(scadenza));
+        } catch (BusBooking.ClienteInesistenteException | ParseException | BusBooking.CartaNonValidaException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    @Override
+    public boolean eliminaCarta(long idCliente, long idCarta) {
+        Cliente cliente = null;
+        try {
+            cliente = busBooking.ottieniCliente(idCliente);
+            return busBooking.eliminaCarta(cliente, idCarta);
+        } catch (BusBooking.ClienteInesistenteException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    @Override
+    public Collection<AcquistoDTO> richiediElencoMovimenti(long idCliente) {
+        try {
+            Cliente cliente = busBooking.ottieniCliente(idCliente);
+            return cliente.ottieniAcquisti().stream().map(
+                    acquisto -> new AcquistoDTO(
+                            acquisto.ottieniBiglietto().ottieniDescrizione().ottieniId(),
+                            acquisto.ottieniBiglietto().ottieniDescrizione().toString(),
+                            acquisto.ottieniPagamento().ottieniCartaDiCredito().ottieniId(),
+                            acquisto.ottieniPagamento().ottieniCartaDiCredito().ottieniCodiceOscurato()
+                    )
+            ).collect(Collectors.toList());
+        } catch (BusBooking.ClienteInesistenteException e) {
+            e.printStackTrace();
+            return Collections.emptyList();
+        }
     }
 }

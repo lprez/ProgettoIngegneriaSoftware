@@ -22,21 +22,13 @@ class ClienteTest {
         Cliente cliente = new Cliente(0, "");
         Acquisto acquisto = new Acquisto(biglietto);
 
-        assertFalse(cliente.ottieniAcquisti().hasNext());
+        assertTrue(cliente.ottieniAcquisti().isEmpty());
 
         cliente.aggiungiAcquisto(acquisto);
-        Iterator<Acquisto> it = cliente.ottieniAcquisti();
-        assertTrue(it.hasNext());
-        it.next();
-        assertFalse(it.hasNext());
+        assertEquals(1,  cliente.ottieniAcquisti().size());
 
         cliente.aggiungiAcquisto(acquisto);
-        it = cliente.ottieniAcquisti();
-        assertTrue(it.hasNext());
-        it.next();
-        assertTrue(it.hasNext());
-        it.next();
-        assertFalse(it.hasNext());
+        assertEquals(2,  cliente.ottieniAcquisti().size());
     }
 
     /**
@@ -51,5 +43,19 @@ class ClienteTest {
 
         assertEquals(carta1.ottieniId(), cliente.ottieniCarta(carta1.ottieniId()).ottieniId());
         assertEquals(carta2.ottieniId(), cliente.ottieniCarta(carta2.ottieniId()).ottieniId());
+    }
+
+    @Test
+    void creaPreferito() {
+        Cliente cliente = new Cliente(0, "");
+        Acquisto acquisto = new Acquisto(biglietto);
+
+        cliente.creaPreferito("", acquisto, carta1);
+        cliente.creaPreferito("", acquisto, carta2);
+
+        assertEquals(biglietto.ottieniDescrizione().ottieniId(),
+                cliente.ottieniPreferiti().get(0).ottieniDescrizioneBiglietto().ottieniId());
+        assertEquals(carta1.ottieniId(), cliente.ottieniPreferiti().get(0).ottieniCartaDiCredito().ottieniId());
+        assertEquals(carta2.ottieniId(), cliente.ottieniPreferiti().get(1).ottieniCartaDiCredito().ottieniId());
     }
 }

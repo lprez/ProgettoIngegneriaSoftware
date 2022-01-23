@@ -8,23 +8,30 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 
 public class Input {
-    public static int leggiIntero() throws IOException {
-        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+    public static Integer leggiIntero() throws IOException {
         try {
-            return Integer.parseInt(reader.readLine());
+            return Integer.parseInt(leggiStringa());
         } catch (NumberFormatException e) {
-            throw new IOException(e);
+            return null;
         }
     }
 
     public static byte[] leggiArrayByte() throws IOException {
-        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
-        String line = reader.readLine();
-        if (!line.startsWith("\"")) line = "\"" + line + "\"";
+        String linea = leggiStringa();
+        if (!linea.startsWith("\"")) linea = "\"" + linea + "\"";
         try {
-            return new ObjectMapper().readValue(line, byte[].class);
+            return new ObjectMapper().readValue(linea, byte[].class);
         } catch (MismatchedInputException e) {
             return null;
         }
+    }
+
+    public static String leggiStringa() throws IOException {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+        return reader.readLine();
+    }
+
+    public static boolean leggisN() throws IOException {
+        return leggiStringa().startsWith("s");
     }
 }
