@@ -15,6 +15,6 @@ public class ValidatoreBigliettoTempo extends ValidatoreBiglietto {
     public boolean valido(List<Convalida> convalide, Corsa corsa, Date adesso) {
         if (convalide.size() == 0) return true;
         long intervallo = adesso.getTime() - convalide.get(0).ottieniData().getTime();
-        return TimeUnit.MILLISECONDS.toMinutes(intervallo) <= durataMinuti;
+        return TimeUnit.MILLISECONDS.toMinutes(intervallo) < durataMinuti;
     }
 }
