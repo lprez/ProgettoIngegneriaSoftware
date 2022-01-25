@@ -74,9 +74,13 @@ public class Server {
         DescrizioneBiglietto descrizione3 = new DescrizioneBigliettoTempo(
                 2, BigDecimal.valueOf(0.5), 90
         );
+        DescrizioneBiglietto descrizione4 = new DescrizioneBigliettoTempo(
+                3, BigDecimal.valueOf(0.8), 1
+        );
 
         catalogo1.aggiungiBiglietto(descrizione1);
         catalogo1.aggiungiBiglietto(descrizione2);
+        catalogo1.aggiungiBiglietto(descrizione4);
 
         catalogo2.aggiungiBiglietto(descrizione1);
         catalogo2.aggiungiBiglietto(descrizione2);
@@ -89,11 +93,13 @@ public class Server {
 
         busBooking.aggiungiCliente(cliente1);
 
-        Addetto addetto1 = new Addetto(0, "Pippo");
+        Addetto addetto1 = new Addetto(0, "Mario Rossi");
         Corsa corsa1 = new Corsa(0);
         addetto1.aggiornaCorsa(corsa1);
+        Corsa corsa2 = new Corsa(1);
 
         busBooking.aggiungiAddetto(addetto1);
         busBooking.aggiungiCorsa(corsa1);
+        busBooking.aggiungiCorsa(corsa2);
     }
 }
