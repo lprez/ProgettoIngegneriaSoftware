@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonGetter;
 
 public class PreferitoDTO {
     private final String citta;
-    private final long idDescrizioneBiglietto;
+    private final long idDescrizione;
     private final String descrizioneBiglietto;
     private final long idCarta;
     private final String carta;
@@ -12,7 +12,7 @@ public class PreferitoDTO {
     public PreferitoDTO(String citta, long idDescrizione, String descrizioneBiglietto, long idCarta, String carta) {
         this.citta = citta;
         this.descrizioneBiglietto = descrizioneBiglietto;
-        this.idDescrizioneBiglietto = idDescrizione;
+        this.idDescrizione = idDescrizione;
         this.idCarta = idCarta;
         this.carta = carta;
     }
@@ -27,7 +27,7 @@ public class PreferitoDTO {
 
     @JsonGetter("idDescrizione")
     public long ottieniIdDescrizione() {
-        return idDescrizioneBiglietto;
+        return idDescrizione;
     }
 
     @JsonGetter("idCarta")
