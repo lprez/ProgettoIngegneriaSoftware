@@ -223,12 +223,15 @@ public class GestoreCliente implements ServizioCliente {
         try {
             Cliente cliente = busBooking.ottieniCliente(idCliente);
             return cliente.ottieniAcquisti().stream().map(
-                    acquisto -> new AcquistoDTO(
+                    acquisto -> {
+                        CartaDiCredito carta = acquisto.ottieniPagamento().ottieniCartaDiCredito();
+                        return new AcquistoDTO(
                             acquisto.ottieniBiglietto().ottieniDescrizione().ottieniId(),
                             acquisto.ottieniBiglietto().ottieniDescrizione().toString(),
-                            acquisto.ottieniPagamento().ottieniCartaDiCredito().ottieniId(),
-                            acquisto.ottieniPagamento().ottieniCartaDiCredito().ottieniCodiceOscurato()
-                    )
+                            carta != null ? carta.ottieniId() : -1,
+                            carta != null ? carta.ottieniCodiceOscurato() : "(carta modificata/eliminata)"
+                        );
+                    }
             ).collect(Collectors.toList());
         } catch (BusBooking.ClienteInesistenteException e) {
             e.printStackTrace();
