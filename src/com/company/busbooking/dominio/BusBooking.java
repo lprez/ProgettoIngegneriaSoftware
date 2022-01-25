@@ -18,6 +18,12 @@ public class BusBooking {
         this.servizioPagamento = servizioPagamento;
     }
 
+    public KeyPair ottieniChiavi() {
+        return this.chiave;
+    }
+
+    // Cataloghi
+
     public Collection<String> ottieniListaCitta() {
         return cataloghi.keySet();
     }
@@ -28,6 +34,18 @@ public class BusBooking {
         }
         return cataloghi.get(citta);
     }
+
+    public void aggiungiCatalogo(CatalogoBiglietti catalogo) {
+        cataloghi.put(catalogo.ottieniCitta(), catalogo);
+    }
+
+    public class CatalogoInesistenteException extends Exception {
+        public CatalogoInesistenteException(String msg) {
+            super(msg);
+        }
+    }
+
+    // Acquisto
 
     public Acquisto acquistaBiglietto(DescrizioneBiglietto descrizioneBiglietto)
         throws ErroreCrittografiaException {
@@ -58,9 +76,13 @@ public class BusBooking {
         return esito;
     }
 
-    public void aggiornaCorsa(Addetto addetto, Corsa corsa) {
-        addetto.aggiornaCorsa(corsa);
+    public class ErroreCrittografiaException extends Exception {
+        public ErroreCrittografiaException(String msg, Throwable err) {
+            super(msg, err);
+        }
     }
+
+    // Convalida
 
     public boolean convalidaBiglietto(Addetto addetto, byte[] codice) throws BigliettoInesistenteException {
         Corsa corsa = addetto.ottieniCorsa();
@@ -69,9 +91,7 @@ public class BusBooking {
         return biglietto.convalida(corsa);
     }
 
-    public List<Biglietto> ottieniListaBiglietti(Cliente cliente) {
-        return cliente.ottieniListaBiglietti();
-    }
+    // Biglietti
 
     public Biglietto ottieniBiglietto(long id) throws BigliettoInesistenteException {
         if (!biglietti.containsKey(id)) {
@@ -84,6 +104,14 @@ public class BusBooking {
     public Biglietto ottieniBiglietto(byte[] codice) throws BigliettoInesistenteException {
         return ottieniBiglietto(Biglietto.estraiId(codice));
     }
+
+    public class BigliettoInesistenteException extends Exception {
+        public BigliettoInesistenteException(String msg) {
+            super(msg);
+        }
+    }
+
+    // Preferiti
 
     public void creaPreferito(Cliente cliente, String citta, Acquisto acquisto, CartaDiCredito carta) {
         cliente.creaPreferito(citta, acquisto, carta);
@@ -101,6 +129,8 @@ public class BusBooking {
         cliente.eliminaPreferito(indice);
     }
 
+    // Carte
+
     public Collection<CartaDiCredito> ottieniListaCarte(Cliente cliente) {
         return cliente.ottieniListaCarte();
     }
@@ -113,54 +143,6 @@ public class BusBooking {
 
     public void aggiungiCarta(Cliente cliente, CartaDiCredito carta) {
         cliente.aggiungiCarta(carta);
-    }
-
-    public void aggiungiCliente(Cliente cliente) {
-        clienti.put(cliente.ottieniId(), cliente);
-    }
-
-    public List<Acquisto> ottieniElencoMovimenti(Cliente cliente) {
-        return cliente.ottieniAcquisti();
-    }
-
-    public Cliente ottieniCliente(long idCliente) throws ClienteInesistenteException {
-        if (!clienti.containsKey(idCliente)) {
-            throw new ClienteInesistenteException("Cliente " + idCliente + " non trovato.");
-        } else {
-            return clienti.get(idCliente);
-        }
-    }
-
-    public void aggiungiAddetto(Addetto addetto) {
-        addetti.put(addetto.ottieniId(), addetto);
-    }
-
-    public Addetto ottieniAddetto(long idAddetto) throws AddettoInesistenteException {
-        if (!addetti.containsKey(idAddetto)) {
-            throw new AddettoInesistenteException("Addetto " + idAddetto + " non trovato.");
-        } else {
-            return addetti.get(idAddetto);
-        }
-    }
-
-    public void aggiungiCatalogo(CatalogoBiglietti catalogo) {
-        cataloghi.put(catalogo.ottieniCitta(), catalogo);
-    }
-
-    public KeyPair ottieniChiavi() {
-        return this.chiave;
-    }
-
-    public void aggiungiCorsa(Corsa corsa) {
-        corse.put(corsa.ottieniId(), corsa);
-    }
-
-    public Corsa ottieniCorsa(long idCorsa) throws CorsaInesistenteException {
-        if (!corse.containsKey(idCorsa)) {
-            throw new CorsaInesistenteException("Non c'è nessuna corsa con id " + idCorsa);
-        } else {
-            return corse.get(idCorsa);
-        }
     }
 
     public boolean modificaCarta(Cliente cliente, long idCarta, String codice, String intestatario, Date scadenza) throws CartaNonValidaException {
@@ -179,10 +161,34 @@ public class BusBooking {
         return cliente.eliminaCarta(idCarta);
     }
 
-    public class CatalogoInesistenteException extends Exception {
-        public CatalogoInesistenteException(String msg) {
+    public class CartaNonValidaException extends Exception {
+        public CartaNonValidaException(String msg) {
             super(msg);
         }
+    }
+
+    // Clienti
+
+    public void aggiungiCliente(Cliente cliente) {
+        clienti.put(cliente.ottieniId(), cliente);
+    }
+
+    public Cliente ottieniCliente(long idCliente) throws ClienteInesistenteException {
+        if (!clienti.containsKey(idCliente)) {
+            throw new ClienteInesistenteException("Cliente " + idCliente + " non trovato.");
+        } else {
+            return clienti.get(idCliente);
+        }
+    }
+
+    // tutti i biglietti acquistati
+    public List<Acquisto> ottieniElencoMovimenti(Cliente cliente) {
+        return cliente.ottieniAcquisti();
+    }
+
+    // solo i biglietti che potrebbero essere ancora validi
+    public List<Biglietto> ottieniListaBiglietti(Cliente cliente) {
+        return cliente.ottieniListaBiglietti();
     }
 
     public class ClienteInesistenteException extends Exception {
@@ -191,9 +197,17 @@ public class BusBooking {
         }
     }
 
-    public class BigliettoInesistenteException extends Exception {
-        public BigliettoInesistenteException(String msg) {
-            super(msg);
+    // Addetti
+
+    public void aggiungiAddetto(Addetto addetto) {
+        addetti.put(addetto.ottieniId(), addetto);
+    }
+
+    public Addetto ottieniAddetto(long idAddetto) throws AddettoInesistenteException {
+        if (!addetti.containsKey(idAddetto)) {
+            throw new AddettoInesistenteException("Addetto " + idAddetto + " non trovato.");
+        } else {
+            return addetti.get(idAddetto);
         }
     }
 
@@ -203,20 +217,26 @@ public class BusBooking {
         }
     }
 
+    // Corse
+
+    public void aggiungiCorsa(Corsa corsa) {
+        corse.put(corsa.ottieniId(), corsa);
+    }
+
+    public void aggiornaCorsa(Addetto addetto, Corsa corsa) {
+        addetto.aggiornaCorsa(corsa);
+    }
+
+    public Corsa ottieniCorsa(long idCorsa) throws CorsaInesistenteException {
+        if (!corse.containsKey(idCorsa)) {
+            throw new CorsaInesistenteException("Non c'è nessuna corsa con id " + idCorsa);
+        } else {
+            return corse.get(idCorsa);
+        }
+    }
+
     public class CorsaInesistenteException extends Exception {
         public CorsaInesistenteException(String msg) {
-            super(msg);
-        }
-    }
-
-    public class ErroreCrittografiaException extends Exception {
-        public ErroreCrittografiaException(String msg, Throwable err) {
-            super(msg, err);
-        }
-    }
-
-    public class CartaNonValidaException extends Exception {
-        public CartaNonValidaException(String msg) {
             super(msg);
         }
     }
